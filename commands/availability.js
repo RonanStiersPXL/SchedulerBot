@@ -174,14 +174,32 @@ module.exports = {
             const threshold = interaction.options.getInteger('threshold') ?? 100;
 
             try {
-                const res = await fetch(`${API_URL}/availability/${interaction.guild.id}`);
+                const res = await fetch(
+                    `${API_URL}/availability/${interaction.guild.id}/compare?type=${encodeURIComponent(type)}&threshold=${threshold}`
+                );
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error || 'Failed to fetch');
 
-                await interaction.reply(`Compare for **${type}** (threshold: ${threshold}% is not yet implemented, but data is fetched.)`)
+                const overlaps = data.overlaps || [];
+
+                if (overlaps.length === 0) {
+                    return interaction.editReply(
+                        `No common availability found for **${type}** with at least ${threshold}% of users.`
+                    );
+                }
+
+                const listText = overlaps
+                    .map((o, idx) => {
+                        const start = new Date(o.startUtc).toUTCString();
+                        const end = new Date(o.endUtc).toUTCString();
+                        return `[#${idx + 1}] ${o.users.map(u => `<@${u}>`).join(', ')} — **${type}**: ${start} → ${end}`;
+                    })
+                    .join('\n');
+
+                await interaction.editReply(`Common availability:\n${listText}`);
             } catch (error) {
                 console.log(error);
-                await interaction.editReply(`Failed to compare availability.`)                
+                await interaction.editReply(`Failed to compare availability.`);
             }
         }
     },
