@@ -10,6 +10,7 @@ const {
   ActivityType,
   PresenceUpdateStatus,
   Events,
+  MessageFlags,
 } = require("discord.js");
 
 const client = new Client({
@@ -117,18 +118,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   try {
+    const allowedCategories = ["1334917967678406729", "1407099025798463508"];
+    if (!allowedCategories.includes(interaction.channel.parentId)) {
+      return interaction.reply({
+        content: `There was an error while executing this command!`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
     await command.execute(interaction);
   } catch (error) {
     console.log(error);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: `There was an error while executing this command!`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else {
       await interaction.reply({
         content: `There was an error while executing this command!`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   }
