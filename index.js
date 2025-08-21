@@ -1,3 +1,11 @@
+const express = require('express');
+const app = express();
+app.get('/', (req,res) => {
+    res.send('Server running')
+});
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`Backend listening on port ${PORT}`));
+
 require('dotenv').config();
 
 const { 

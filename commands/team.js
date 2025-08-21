@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-
+require('dotenv').config();
 const API_URL = process.env.API_URL || 'http://localhost:3000'
 
 module.exports = {
