@@ -22,8 +22,8 @@ const client = new Client({
   partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember],
 });
 
-const fs = require("node:fs");
-const path = require("node:path");
+const fs = require("fs");
+const path = require("path");
 
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
@@ -47,8 +47,8 @@ const deployCommands = async () => {
     }
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     console.log(`Started refreshing ${commands.length} application slash command(s) globally.`);
-    const data = await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-      body: commands,
+    await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), {
+      body: [],
     });
     console.log(`Succesfully reloaded all commands!`);
   } catch (error) {
