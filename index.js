@@ -104,7 +104,7 @@ client.once(Events.ClientReady, async () => {
         }]
     });
     console.log(`Bot status set to: ${statusType}`);
-    console.log(`Activity set to: ${activityType} ${activityName}`);    
+    console.log(`Activity set to: ${activityType} ${activityName}`);
 });
 
 client.on(Events.InteractionCreate, async interaction => {

@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('availability')
         .setDescription('Manage your availability')
+        // add Availability (per person)
         .addSubcommand(sub =>
             sub.setName('add')
                 .setDescription('Add your availability')
@@ -30,7 +31,7 @@ module.exports = {
                     option.setName('duration')
                         .setDescription('Duration in hours')
                         .setRequired(true)))
-
+        // remove Availability (per person, per shortId)
         .addSubcommand(sub =>
             sub.setName('remove')
                 .setDescription('Remove an availability')
@@ -38,7 +39,7 @@ module.exports = {
                     option.setName('id')
                         .setDescription('The short ID of your availability')
                         .setRequired(true)))
-
+        // list Availabilities (per person or everyone, per type)
         .addSubcommand(sub =>
             sub.setName('list')
                 .setDescription('List availabilities')
@@ -53,7 +54,7 @@ module.exports = {
                 .addBooleanOption(option =>
                     option.setName('all')
                         .setDescription('Show all users instead of just yours')))
-
+        // compare Availabilities (per type)
         .addSubcommand(sub =>
             sub.setName('compare')
                 .setDescription('Find common availability slots')
@@ -134,23 +135,30 @@ module.exports = {
             const all = interaction.options.getBoolean('all') || false;
 
             try {
-                const res = await fetch(`${API_URL}/availability/${interaction.guild.id}/${interaction.user.id}/${interaction.type}`, {
+                let url;
+                if (all) {
+                    url = `${API_URL}/teams/${interaction.guild.id}/user/${interaction.user.id}/availabilities`;
+                }
+                else{
+                    url = `${API_URL}/availability/${interaction.guild.id}/${interaction.user.id}/${interaction.type}`
+                }
+                const res = await fetch(url, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json'}
-                });             
+                });
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error || 'Failed to fetch');
 
                 const availabilities  = data.results || [];
 
+                if (availabilities.length === 0) {
+                    return interaction.editReply(all ? 'No team availability found.' : 'You have no availability set.');
+                }
+
                 let filtered = all ? availabilities : availabilities.filter(a => a.userId === interaction.user.id);
 
                 if (type) {
                     filtered = filtered.filter(a => a.type === type);
-                }
-
-                if (filtered.length === 0) {
-                    return interaction.editReply(all ? 'No team availability found.' : 'You have no availability set.');
                 }
 
                 const listText = filtered
@@ -175,7 +183,7 @@ module.exports = {
 
             try {
                 const res = await fetch(
-                    `${API_URL}/availability/${interaction.guild.id}/compare?type=${encodeURIComponent(type)}&threshold=${threshold}`
+                    `${API_URL}/availability/${interaction.guild.id}/compare?type=${encodeURIComponent(type)}&threshold=${threshold}&userId=${interaction.user.id}`
                 );
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error || 'Failed to fetch');
