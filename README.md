@@ -24,3 +24,18 @@ docker run -d \
  --env-file /opt/scheduler-bot/.env \
  --restart unless-stopped \
  docker_username/schedulerbot:latest
+
+# or add a docker compose for easier use
+
+cd /opt/scheduler-bot
+
+services:
+bot:
+image: docker_username/scheduler-bot:latest
+container_name: scheduler-bot
+env_file: - .env
+restart: unless-stopped
+
+cd /opt/scheduler-bot
+docker compose pull
+docker compose up -d
