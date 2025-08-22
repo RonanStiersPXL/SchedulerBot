@@ -48,7 +48,32 @@ module.exports = {
             .addSubcommand(sub =>
                 sub.setName('delete')
                     .setDescription('Delete your team (only if you are the creator)')
-            ),
+            )
+            // add member to Team
+            .addSubcommand(sub => 
+                sub.setName('add')
+                    .setDescription('Add members to your existing team')
+                    .addUserOption(option =>
+                        option.setName('member1')
+                            .setDescription('Member to add')
+                            .setRequired(true))
+                    .addUserOption(option =>
+                        option.setName('member2')
+                            .setDescription('Member to add')
+                            .setRequired(false))
+                    .addUserOption(option =>
+                        option.setName('member3')
+                            .setDescription('Member to add')
+                            .setRequired(false))
+                    .addUserOption(option =>
+                        option.setName('member4')
+                            .setDescription('Member to add')
+                            .setRequired(false))
+                    .addUserOption(option =>
+                        option.setName('member5')
+                            .setDescription('Member to add')
+                            .setRequired(false))
+                        ),
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
 
@@ -140,6 +165,36 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.editReply(`Failed to delete your team.`);
+            }
+        }
+        else if (sub === 'add') {
+            await interaction.deferReply();
+            const members = [];
+
+            for (let i = 1; i <= 5; i++) {
+                const member = interaction.options.getUser(`member${i}`);
+                if (member) members.push(member.id);
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/teams/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        guildId: interaction.guild.id,
+                        members,
+                        userId: interaction.user.id,
+                    }),
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Failed to add members to the team');
+
+                await interaction.editReply(
+                    `Added members: ${members.map(m => `<@${m}>`).join(', ')} to your team`
+                );
+            } catch (error) {
+                console.error(error);
+                await interaction.editReply(`Failed to add members to the team.`);
             }
         }
     }
