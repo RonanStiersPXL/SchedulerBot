@@ -55,25 +55,25 @@ module.exports = {
                     .setDescription('Add members to your existing team')
                     .addUserOption(option =>
                         option.setName('member1')
-                            .setDescription('Member to add')
+                            .setDescription('First member to add')
                             .setRequired(true))
                     .addUserOption(option =>
                         option.setName('member2')
-                            .setDescription('Member to add')
+                            .setDescription('Second member to add')
                             .setRequired(false))
                     .addUserOption(option =>
                         option.setName('member3')
-                            .setDescription('Member to add')
+                            .setDescription('Third member to add')
                             .setRequired(false))
                     .addUserOption(option =>
                         option.setName('member4')
-                            .setDescription('Member to add')
+                            .setDescription('Fourth member to add')
                             .setRequired(false))
                     .addUserOption(option =>
                         option.setName('member5')
-                            .setDescription('Member to add')
+                            .setDescription('Fifth member to add')
                             .setRequired(false))
-                        ),
+            ),
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
 
