@@ -173,13 +173,11 @@ module.exports = {
             }
 
             try {
-                const res = await fetch(`${API_URL}/teams/add`, {
+                const res = await fetch(`${API_URL}/teams/add/${interaction.guild.id}/user/${interaction.user.id}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        guildId: interaction.guild.id,
                         members,
-                        userId: interaction.user.id,
                     }),
                 });
                 const data = await res.json();
