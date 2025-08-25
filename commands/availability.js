@@ -177,9 +177,7 @@ module.exports = {
         let filtered = all
           ? availabilities
           : availabilities.filter((a) => a.userId === interaction.user.id);
-        
-          filtered = filtered.filter((a) => a.guildId === interaction.guild.id);
-
+          
         if (type) {
           filtered = filtered.filter((a) => a.type === type);
         }
