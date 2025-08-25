@@ -76,7 +76,6 @@ module.exports = {
             ),
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
-
         if (sub === 'create') {
             await interaction.deferReply();
 
@@ -91,7 +90,7 @@ module.exports = {
             try {
                 const res = await fetch(`${API_URL}/teams`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         guildId: interaction.guild.id,
                         teamName: name,
@@ -109,8 +108,7 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to create team.`);
             }
-        }
-        else if (sub === 'list') {
+        } else if (sub === 'list') {
             await interaction.deferReply();
             const all = interaction.options.getBoolean('all') || false;
 
@@ -140,7 +138,7 @@ module.exports = {
                         return interaction.editReply("You are not in a team yet.");
                     }
 
-                    const { teamName, members } = data.team;
+                    const {teamName, members} = data.team;
                     await interaction.editReply(
                         `Team **${teamName}**:\n${members.map(m => `<@${m}>`).join('\n')}`
                     );
@@ -149,14 +147,13 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to fetch team(s).`);
             }
-        }
-        else if (sub === 'delete') {
+        } else if (sub === 'delete') {
             await interaction.deferReply();
 
             try {
                 const res = await fetch(`${API_URL}/teams/${interaction.guild.id}/user/${interaction.user.id}`, {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                 });
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error || 'Failed to delete team');
@@ -166,8 +163,7 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to delete your team.`);
             }
-        }
-        else if (sub === 'add') {
+        } else if (sub === 'add') {
             await interaction.deferReply();
             const members = [];
 
@@ -179,7 +175,7 @@ module.exports = {
             try {
                 const res = await fetch(`${API_URL}/teams/add`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         guildId: interaction.guild.id,
                         members,
