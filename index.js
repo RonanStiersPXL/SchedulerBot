@@ -118,7 +118,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   try {
-    const allowedCategories = ["1334917967678406729", "1407099025798463508"];
+    const allowedCategories = [
+      "1334917967678406729", // PXL-Esports category
+      "1407099025798463508" // Bot Torture Center category
+    ];
     if (!allowedCategories.includes(interaction.channel.parentId)) {
       return interaction.reply({
         content: `There was an error while executing this command!`,
