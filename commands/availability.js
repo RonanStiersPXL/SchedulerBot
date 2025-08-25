@@ -84,8 +84,11 @@ module.exports = {
             .setMaxValue(100)
             .setRequired(false)
         )
+    )
+    .addSubcommand(sub =>
+    sub.setName('clear')
+        .setDescription('Clears your teams availabilities (only if you are the creator)')
     ),
-
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
 
@@ -232,6 +235,17 @@ module.exports = {
         console.log(error);
         await interaction.editReply(`Failed to compare availability.`);
       }
-    }
+    } else if (sub === 'clear') {
+            await interaction.deferReply();
+            try {
+                const res = await fetch(`${API_URL}/availability/${interaction.guild.id}/clear/${interaction.user.id}`)
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || "Failed to clear your teams schedule");
+                await interaction.editReply(`Cleared ${data.team}'s schedule.`);
+            } catch (error) {
+              console.log(error);
+              await interaction.editReply(`Failed to clear your teams schedule`);
+            }
+      }
   },
 };
