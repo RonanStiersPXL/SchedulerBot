@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 require("dotenv").config();
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL || 'http://localhost:3000'
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -174,6 +174,8 @@ module.exports = {
         let filtered = all
           ? availabilities
           : availabilities.filter((a) => a.userId === interaction.user.id);
+        
+          filtered = filtered.filter((a) => a.guildId === interaction.guild.id);
 
         if (type) {
           filtered = filtered.filter((a) => a.type === type);
