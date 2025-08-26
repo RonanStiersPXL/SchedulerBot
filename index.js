@@ -48,9 +48,10 @@ const deployCommands = async () => {
     }
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     console.log(`Started refreshing ${commands.length} application slash command(s) globally.`);
-    await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), {
-      body: [],
-    });
+    await rest.put(
+        Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+        { body: commands },
+    );
     console.log(`Succesfully reloaded all commands!`);
   } catch (error) {
     console.log("Error deplying commands: ", error);
