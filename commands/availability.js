@@ -168,7 +168,6 @@ module.exports = {
         const availabilities = data.results || [];
 
         if (availabilities.length === 0) {
-          i;
           return interaction.editReply(
             all ? 'No team availability found.' : 'You have no availability set.'
           );
