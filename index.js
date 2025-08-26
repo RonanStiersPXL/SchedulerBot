@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 
 const {
   REST,
@@ -11,7 +11,7 @@ const {
   PresenceUpdateStatus,
   Events,
   MessageFlags,
-} = require("discord.js");
+} = require('discord.js');
 
 const client = new Client({
   intents: [
@@ -23,26 +23,26 @@ const client = new Client({
   partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember],
 });
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 
 const deployCommands = async () => {
   try {
     const commands = [];
     const commandFiles = fs
-      .readdirSync(path.join(__dirname, "commands"))
-      .filter((file) => file.endsWith(".js"));
+      .readdirSync(path.join(__dirname, 'commands'))
+      .filter((file) => file.endsWith('.js'));
 
     for (const file of commandFiles) {
       const command = require(`./commands/${file}`);
-      if ("data" in command && "execute" in command) {
+      if ('data' in command && 'execute' in command) {
         commands.push(command.data.toJSON());
       } else {
         console.log(
-          `WARNING: The command at ${file} is missing a required "data" or "execute" property.`
+          `WARNING: The command at ${file} is missing a required 'data' or 'execute' property.`
         );
       }
     }
@@ -54,7 +54,7 @@ const deployCommands = async () => {
     );
     console.log(`Succesfully reloaded all commands!`);
   } catch (error) {
-    console.log("Error deplying commands: ", error);
+    console.log('Error deplying commands: ', error);
   }
 };
 
@@ -64,10 +64,10 @@ for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
 
-  if ("data" in command && "execute" in command) {
+  if ('data' in command && 'execute' in command) {
     client.commands.set(command.data.name, command);
   } else {
-    console.log(`The Command ${filePath} is missing a required "data" or "execute" property.`);
+    console.log(`The Command ${filePath} is missing a required 'data' or 'execute' property.`);
   }
 }
 
@@ -77,9 +77,9 @@ client.once(Events.ClientReady, async () => {
   //Deploying Commands
   await deployCommands();
   console.log(`Commands deployed globally.`);
-  const statusType = process.env.BOT_STATUS || "online";
-  const activityType = process.env.ACTIVITY_TYPE || "PLAYING";
-  const activityName = process.env.ACTIVITY_NAME || "Discord";
+  const statusType = process.env.BOT_STATUS || 'online';
+  const activityType = process.env.ACTIVITY_TYPE || 'PLAYING';
+  const activityName = process.env.ACTIVITY_NAME || 'Discord';
 
   const activityTypeMap = {
     PLAYING: ActivityType.Playing,
@@ -120,8 +120,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     const allowedCategories = [
-      "1334917967678406729", // PXL-Esports category
-      "1407099025798463508" // Bot Torture Center category
+      '1334917967678406729', // PXL-Esports category
+      '1407099025798463508' // Bot Torture Center category
     ];
     if (!allowedCategories.includes(interaction.channel.parentId)) {
       return interaction.reply({

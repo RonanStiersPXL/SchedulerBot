@@ -120,7 +120,7 @@ module.exports = {
                     if (!data.success) throw new Error(data.error || 'Failed to fetch teams');
 
                     if (!data.results || data.results.length === 0) {
-                        return interaction.editReply("No teams found in this server.");
+                        return interaction.editReply('No teams found in this server.');
                     }
 
                     const text = data.results
@@ -135,7 +135,7 @@ module.exports = {
                     if (!data.success) throw new Error(data.error || 'Failed to fetch team');
 
                     if (!data.team) {
-                        return interaction.editReply("You are not in a team yet.");
+                        return interaction.editReply('You are not in a team yet.');
                     }
 
                     const {teamName, members} = data.team;
