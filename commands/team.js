@@ -76,7 +76,25 @@ module.exports = {
             ),
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
-        if (sub === 'create') {
+
+        // Switch for all possible subcommands
+        switch (sub) {
+            case "create":
+                createTeam();
+                break;
+            case "list":
+                listTeam();
+                break;
+            case "delete":
+                deleteTeam();
+                break;
+            case "add":
+                addMember();
+            default:
+                break;
+        }
+        
+        async function createTeam(){
             await interaction.deferReply();
 
             const name = interaction.options.getString('name');
@@ -108,7 +126,8 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to create team.`);
             }
-        } else if (sub === 'list') {
+        }
+        async function listTeam() {
             await interaction.deferReply();
             const all = interaction.options.getBoolean('all') || false;
 
@@ -147,7 +166,8 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to fetch team(s).`);
             }
-        } else if (sub === 'delete') {
+        }
+        async function deleteTeam(){
             await interaction.deferReply();
 
             try {
@@ -163,7 +183,8 @@ module.exports = {
                 console.error(error);
                 await interaction.editReply(`Failed to delete your team.`);
             }
-        } else if (sub === 'add') {
+        }
+        async function addMember(){
             await interaction.deferReply();
             const members = [];
 
