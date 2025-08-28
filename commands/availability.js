@@ -85,6 +85,7 @@ module.exports = {
             .setRequired(false)
         )
     )
+    // clear Availabilities for a whole team
     .addSubcommand(sub =>
     sub.setName('clear')
         .setDescription('Clears your teams availabilities (only if you are the creator)')
@@ -92,7 +93,27 @@ module.exports = {
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
 
-    if (sub === 'add') {
+    // Switch for all possible subcommands
+    switch(sub) {
+      case "add":
+        addAvailability();
+        break;
+      case "remove":
+        removeAvailability();
+        break;
+      case "list":
+        listAvailability();
+        break;
+      case "compare":
+        compareAvailability();
+        break;
+      case "clear":
+        clearAvailability();
+        break;
+      default:
+    }
+
+    async function addAvailability() {
       await interaction.deferReply();
 
       const type = interaction.options.getString('type');
@@ -121,13 +142,14 @@ module.exports = {
         await interaction.editReply(
           `Added availability [#${
             data.shortId
-          }] for **${type}**: ${startDateTime.toUTCString()} → ${endDateTime.toUTCString()}`
+          }] for **${type}**: ${startDateTime.to()} → ${endDateTime.toUTCString()}`
         );
       } catch (error) {
         console.log(error);
         await interaction.editReply(`Failed to add availability.`);
       }
-    } else if (sub === 'remove') {
+    }
+    async function removeAvailability(){
       await interaction.deferReply();
       const id = interaction.options.getInteger('id');
 
@@ -146,7 +168,8 @@ module.exports = {
         console.log(error);
         await interaction.editReply(`Failed to remove availability.`);
       }
-    } else if (sub === 'list') {
+    }
+    async function listAvailability(){
       await interaction.deferReply();
       const type = interaction.options.getString('type');
       const all = interaction.options.getBoolean('all') || false;
@@ -195,7 +218,8 @@ module.exports = {
         console.error(err);
         await interaction.editReply('Failed to fetch availability.');
       }
-    } else if (sub === 'compare') {
+    }
+    async function compareAvailability(){
       await interaction.deferReply();
       const type = interaction.options.getString('type');
       const threshold = interaction.options.getInteger('threshold') ?? 100;
@@ -232,7 +256,8 @@ module.exports = {
         console.log(error);
         await interaction.editReply(`Failed to compare availability.`);
       }
-    } else if (sub === 'clear') {
+    }
+    async function clearAvailability(){
       await interaction.deferReply();
       try {
         const res = await fetch(`${API_URL}/teams/clear/${interaction.guild.id}/${interaction.user.id}`);
