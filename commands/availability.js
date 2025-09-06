@@ -179,7 +179,7 @@ module.exports = {
         if (all) {
           url = `${API_URL}/teams/${interaction.guild.id}/user/${interaction.user.id}/availabilities`;
         } else {
-          url = `${API_URL}/availability/${interaction.guild.id}/${interaction.user.id}/${interaction.type}`;
+          url = `${API_URL}/availability/${interaction.guild.id}/${interaction.user.id}`;
         }
         const res = await fetch(url, {
           method: 'GET',
