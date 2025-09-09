@@ -49,14 +49,14 @@ jobs:
       - name: Build image
         if: env.versionChanged == 'true'
         run: |
-          docker build -t boelverse/schedulerbot:${{ env.NEW_VERSION }} .
-          docker tag boelverse/schedulerbot:${{ env.NEW_VERSION }} boelverse/schedulerbot:latest
+          docker build -t ronseren/schedulerbot:${{ env.NEW_VERSION }} .
+          docker tag ronseren/schedulerbot:${{ env.NEW_VERSION }} ronseren/schedulerbot:latest
 
       - name: Push image
         if: env.versionChanged == 'true'
         run: |
-          docker push boelverse/schedulerbot:${{ env.NEW_VERSION }}
-          docker push boelverse/schedulerbot:latest
+          docker push ronseren/schedulerbot:${{ env.NEW_VERSION }}
+          docker push ronseren/schedulerbot:latest
 
       - name: Notify Discord (optional)
         if: env.versionChanged == 'true' && vars.DISCORD_WEBHOOK_UPDATE != ''
