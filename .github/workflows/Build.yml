@@ -64,31 +64,3 @@ jobs:
         with:
           webhook-url: ${{ vars.DISCORD_WEBHOOK_UPDATE }}
           content: "SchedulerBot **${{ env.NEW_VERSION }}** built & pushed to Docker Hub."
-
-      - name: Copy docker-compose.yml to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ronan
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "Docker/docker-compose.yml"
-          target: "/opt/Scheduler-bot"
-
-      - name: Deploy on server (pull & recreate)
-        if: env.versionChanged == 'true'
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ronan
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -euo pipefail
-            cd /opt/Scheduler-bot
-            if command -v docker compose >/dev/null 2>&1; then
-              docker compose pull
-              docker compose up -d --remove-orphans --pull always --force-recreate
-            else
-              docker-compose pull
-              docker-compose up -d --remove-orphans
-            fi
-            docker system prune -f

@@ -29,12 +29,13 @@ docker run -d \
 
 cd /opt/scheduler-bot
 
-services:
-bot:
-image: docker_username/scheduler-bot:latest
-container_name: scheduler-bot
-env_file: - .env
-restart: unless-stopped
+services: \
+ bot: \
+ image: ronseren/schedulerbot:latest \
+ pull_policy: always \
+ container_name: schedulerbot \
+ env_file: - .env \
+ restart: unless-stopped \
 
 cd /opt/scheduler-bot
 docker compose pull
