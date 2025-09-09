@@ -142,7 +142,7 @@ module.exports = {
         await interaction.editReply(
           `Added availability [#${
             data.shortId
-          }] for **${type}**: ${startDateTime.to()} → ${endDateTime.toUTCString()}`
+          }] for **${type}**: ${startDateTime.toUTCString()} → ${endDateTime.toUTCString()}`
         );
       } catch (error) {
         console.log(error);
