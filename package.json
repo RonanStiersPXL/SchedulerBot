@@ -1,6 +1,6 @@
 {
   "name": "schedulerbot",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A Scheduler Bot for planning Official matches, Scrims and Premier Matches.",
   "main": "index.js",
   "scripts": {

@@ -1,0 +1,66 @@
+name: Build and Deploy SchedulerBot
+
+on:
+  push:
+    paths:
+      - "package.json"
+      - "Dockerfile"
+      - "src/**"
+      - "Docker/**"
+      - ".github/workflows/deploy-schedulerbot.yml"
+
+jobs:
+  build-and-deploy:
+    if: github.repository == 'RonanStiersPXL/SchedulerBot'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Extract version from package.json (new vs previous)
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y jq
+          NEW_VERSION=$(jq -r '.version' package.json)
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          if git rev-parse HEAD^ >/dev/null 2>&1 && git show HEAD^:package.json >/dev/null 2>&1; then
+            OLD_VERSION=$(git show HEAD^:package.json | jq -r '.version')
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
+          if [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
+            echo "versionChanged=false" >> $GITHUB_ENV
+          else
+            echo "versionChanged=true" >> $GITHUB_ENV
+          fi
+          echo "New: $NEW_VERSION | Old: $OLD_VERSION | Changed: ${{ env.versionChanged }}"
+
+      - name: Stop if no version change
+        if: env.versionChanged == 'false'
+        run: echo "No version change detected, skipping build & deploy."
+
+      - name: Docker login
+        if: env.versionChanged == 'true'
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build image
+        if: env.versionChanged == 'true'
+        run: |
+          docker build -t ronseren/schedulerbot:${{ env.NEW_VERSION }} .
+          docker tag ronseren/schedulerbot:${{ env.NEW_VERSION }} ronseren/schedulerbot:latest
+
+      - name: Push image
+        if: env.versionChanged == 'true'
+        run: |
+          docker push ronseren/schedulerbot:${{ env.NEW_VERSION }}
+          docker push ronseren/schedulerbot:latest
+
+      - name: Notify Discord (optional)
+        if: env.versionChanged == 'true' && vars.DISCORD_WEBHOOK_UPDATE != ''
+        uses: tsickert/discord-webhook@v6.0.0
+        with:
+          webhook-url: ${{ vars.DISCORD_WEBHOOK_UPDATE }}
+          content: "SchedulerBot **${{ env.NEW_VERSION }}** built & pushed to Docker Hub."
