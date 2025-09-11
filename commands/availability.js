@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 require('dotenv').config();
-const API_URL = process.env.API_URL || 'http://localhost:3000'
+const API_URL = process.env.API_URL || 'http://localhost:3000';
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,13 +23,22 @@ module.exports = {
             )
         )
         .addStringOption((option) =>
-          option.setName('date').setDescription('Date (YYYY-MM-DD)').setRequired(true)
+          option
+            .setName('date')
+            .setDescription('Date (YYYY-MM-DD)')
+            .setRequired(true)
         )
         .addStringOption((option) =>
-          option.setName('time').setDescription('Start time (HH:mm, 24h)').setRequired(true)
+          option
+            .setName('time')
+            .setDescription('Start time (HH:mm, 24h)')
+            .setRequired(true)
         )
         .addIntegerOption((option) =>
-          option.setName('duration').setDescription('Duration in hours').setRequired(true)
+          option
+            .setName('duration')
+            .setDescription('Duration in hours')
+            .setRequired(true)
         )
     )
     // remove Availability (per person, per shortId)
@@ -38,7 +47,10 @@ module.exports = {
         .setName('remove')
         .setDescription('Remove an availability')
         .addIntegerOption((option) =>
-          option.setName('id').setDescription('The short ID of your availability').setRequired(true)
+          option
+            .setName('id')
+            .setDescription('The short ID of your availability')
+            .setRequired(true)
         )
     )
     // list Availabilities (per person or everyone, per type)
@@ -57,7 +69,9 @@ module.exports = {
             )
         )
         .addBooleanOption((option) =>
-          option.setName('all').setDescription('Show all users instead of just yours')
+          option
+            .setName('all')
+            .setDescription('Show all users instead of just yours')
         )
     )
     // compare Availabilities (per type)
@@ -86,28 +100,31 @@ module.exports = {
         )
     )
     // clear Availabilities for a whole team
-    .addSubcommand(sub =>
-    sub.setName('clear')
-        .setDescription('Clears your teams availabilities (only if you are the creator)')
+    .addSubcommand((sub) =>
+      sub
+        .setName('clear')
+        .setDescription(
+          'Clears your teams availabilities (only if you are the creator)'
+        )
     ),
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
 
     // Switch for all possible subcommands
-    switch(sub) {
-      case "add":
+    switch (sub) {
+      case 'add':
         addAvailability();
         break;
-      case "remove":
+      case 'remove':
         removeAvailability();
         break;
-      case "list":
+      case 'list':
         listAvailability();
         break;
-      case "compare":
+      case 'compare':
         compareAvailability();
         break;
-      case "clear":
+      case 'clear':
         clearAvailability();
         break;
       default:
@@ -123,7 +140,9 @@ module.exports = {
 
       try {
         const startDateTime = new Date(`${date}T${time}:00Z`);
-        const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 60 * 1000);
+        const endDateTime = new Date(
+          startDateTime.getTime() + duration * 60 * 60 * 1000
+        );
 
         const res = await fetch(`${API_URL}/availability`, {
           method: 'POST',
@@ -137,7 +156,8 @@ module.exports = {
           }),
         });
         const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Failed to add availability');
+        if (!data.success)
+          throw new Error(data.error || 'Failed to add availability');
 
         await interaction.editReply(
           `Added availability [#${
@@ -149,7 +169,7 @@ module.exports = {
         await interaction.editReply(`Failed to add availability.`);
       }
     }
-    async function removeAvailability(){
+    async function removeAvailability() {
       await interaction.deferReply();
       const id = interaction.options.getInteger('id');
 
@@ -169,7 +189,7 @@ module.exports = {
         await interaction.editReply(`Failed to remove availability.`);
       }
     }
-    async function listAvailability(){
+    async function listAvailability() {
       await interaction.deferReply();
       const type = interaction.options.getString('type');
       const all = interaction.options.getBoolean('all') || false;
@@ -192,14 +212,16 @@ module.exports = {
 
         if (availabilities.length === 0) {
           return interaction.editReply(
-            all ? 'No team availability found.' : 'You have no availability set.'
+            all
+              ? 'No team availability found.'
+              : 'You have no availability set.'
           );
         }
 
         let filtered = all
           ? availabilities
           : availabilities.filter((a) => a.userId === interaction.user.id);
-          
+
         if (type) {
           filtered = filtered.filter((a) => a.type === type);
         }
@@ -219,19 +241,23 @@ module.exports = {
         await interaction.editReply('Failed to fetch availability.');
       }
     }
-    async function compareAvailability(){
+    async function compareAvailability() {
       await interaction.deferReply();
       const type = interaction.options.getString('type');
       const threshold = interaction.options.getInteger('threshold') ?? 100;
 
       try {
         const res = await fetch(
-          `${API_URL}/availability/${interaction.guild.id}/compare?type=${encodeURIComponent(
+          `${API_URL}/teams/${
+            interaction.guild.id
+          }/compare?type=${encodeURIComponent(
             type
-          )}&threshold=${threshold}&userId=${interaction.user.id}`
+          )}&treshhold=${threshold}/&userId=${interaction.user.id}`
         );
+
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to fetch');
+        console.log(data);
 
         const overlaps = data.overlaps || [];
 
@@ -257,10 +283,12 @@ module.exports = {
         await interaction.editReply(`Failed to compare availability.`);
       }
     }
-    async function clearAvailability(){
+    async function clearAvailability() {
       await interaction.deferReply();
       try {
-        const res = await fetch(`${API_URL}/teams/clear/${interaction.guild.id}/${interaction.user.id}`);
+        const res = await fetch(
+          `${API_URL}/teams/clear/${interaction.guild.id}/${interaction.user.id}`
+        );
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
         await interaction.editReply(`${data.message}`);
