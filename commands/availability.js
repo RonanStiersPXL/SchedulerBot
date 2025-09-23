@@ -153,6 +153,7 @@ module.exports = {
             type,
             startUtc: startDateTime.toISOString(),
             endUtc: endDateTime.toISOString(),
+            userName: interaction.user.username,
           }),
         });
         const data = await res.json();
